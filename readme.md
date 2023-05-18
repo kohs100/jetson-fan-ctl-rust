@@ -31,9 +31,9 @@ The script will automatically run at boot time.
 It's a set-it-and-forget-it type thing, unless you want to mess with the fan speeds.
 
 ## How to customize:
-open /etc/automagic-fan/config.json with your favorite editor (I'm using nano):  
+open /etc/jetson-fan-ctl-fan/config.json with your favorite editor (I'm using nano):  
 
-<code>$ sudo nano /etc/jetson-fan-ctl-rust/config.json</code>
+<code>$ sudo nano /etc/jetson-fan-ctl-rust/config.ini</code>
 
 you will find the following lines:
 ```
