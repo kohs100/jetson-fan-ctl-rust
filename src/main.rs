@@ -71,7 +71,15 @@ impl Config {
         let s = fs::read_to_string("/etc/jetson-fan-ctl-rust/config.json")
             .expect("Could not read the config file");
 
-        let config: Config = serde_json::from_str(&s).unwrap_or_default();
+        let config: Config = match serde_json::from_str(&s) {
+            Ok(conf) => {
+                conf
+            },
+            Err(_) => {
+                println!("Invalid config file detected. Falling to default...");
+                Config::default()
+            }
+        };
         assert!(config.min_temp < config.max_temp, "max temp is lower them min temp. Terminating...");
 
         config
