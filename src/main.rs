@@ -1,7 +1,7 @@
 use std::{time, thread, process, fs};
-use serde::{Serialize, Deserialize};
+use serde::Deserialize;
 
-#[derive(Copy, Clone, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Deserialize, Debug)]
 #[repr(u8)]
 enum ThermalZone {
     A0 = 0,
@@ -12,7 +12,7 @@ enum ThermalZone {
     FAN = 5,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 struct Config {
     min_temp: i64,
     max_temp: i64,
