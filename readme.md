@@ -13,21 +13,20 @@ Additionally, I recommend you use the barrel jack with a 4A power supply.
 I will assume you use the standard image on your jetson nano.
 
 In other words, there must be following devices and valid.
-    /sys/devices/pwm-fan/target_pwm
-    /sys/devices/virtual/thermal/thermal_zone0
-    /sys/devices/virtual/thermal/thermal_zone1
-    /sys/devices/virtual/thermal/thermal_zone2
-    /sys/devices/virtual/thermal/thermal_zone3
-    /sys/devices/virtual/thermal/thermal_zone4
-    /sys/devices/virtual/thermal/thermal_zone5
-    /sys/devices/virtual/thermal/thermal_zone6
+* /sys/devices/pwm-fan/target_pwm
+* /sys/devices/virtual/thermal/thermal_zone0
+* /sys/devices/virtual/thermal/thermal_zone1
+* /sys/devices/virtual/thermal/thermal_zone2
+* /sys/devices/virtual/thermal/thermal_zone3
+* /sys/devices/virtual/thermal/thermal_zone4
+* /sys/devices/virtual/thermal/thermal_zone5
+* /sys/devices/virtual/thermal/thermal_zone6
 
 GLIBC 2.17 or later version is needed. 
 Tested and build in Jetson nano Rev.A02 w/ L4T 32.7.3 (Linux 4.9.299-tegra), which is the latest official L4T image which supports Jetson nano.
 
 ## How to install:
-run
-    sudo ./install.sh
+<code>$ sudo ./install.sh</code>
 
 The script will automatically run at boot time.
 It's a set-it-and-forget-it type thing, unless you want to mess with the fan speeds.
@@ -35,9 +34,10 @@ It's a set-it-and-forget-it type thing, unless you want to mess with the fan spe
 ## How to customize:
 open /etc/automagic-fan/config.json with your favorite editor (I'm using nano):  
 
-    sudo nano /etc/automagic-fan/config.json
+<code>$ sudo nano /etc/automagic-fan/config.json</code>
 
 you will find the following lines:
+<code>
     {
         "min_temp": 30000,
         "max_temp": 60000,
@@ -45,6 +45,7 @@ you will find the following lines:
         "thermal_zone": "FAN",
         "max_perf": true
     }
+</code>
 
 <code>min_temp</code> is the temperature (0.001°C) below which the fan is at 0% speed.  
 <code>max_temp</code> is the temperature (0.001°C) above which the fan is at 100% speed.  
