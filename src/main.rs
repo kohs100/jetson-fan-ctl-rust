@@ -1,8 +1,7 @@
-use std::{time, thread, process, fs};
-use serde::Deserialize;
+use configparser::ini::Ini;
+use std::{fs, process, thread, time};
 
-#[derive(Copy, Clone, Deserialize, Debug)]
-#[repr(u8)]
+#[derive(Copy, Clone, Debug)]
 enum ThermalZone {
     A0 = 0,
     CPU = 1,
@@ -12,13 +11,12 @@ enum ThermalZone {
     FAN = 5,
 }
 
-#[derive(Deserialize, Debug)]
 struct Config {
     min_temp: i64,
     max_temp: i64,
     interval_sec: u64,
     thermal_zone: ThermalZone,
-    max_perf: bool
+    max_perf: bool,
 }
 
 impl Default for Config {
@@ -28,7 +26,7 @@ impl Default for Config {
             max_temp: 60,
             interval_sec: 5,
             thermal_zone: ThermalZone::FAN,
-            max_perf: true
+            max_perf: true,
         }
     }
 }
@@ -37,9 +35,11 @@ impl Config {
     fn read_temp(&self) -> i64 {
         let zone = self.thermal_zone as u8;
         let path = format!("/sys/devices/virtual/thermal/thermal_zone{}/temp", zone);
-        let s_temp = fs::read_to_string(path)
-            .expect("Could not read temperature device");
-        s_temp.trim().parse::<i64>().expect("Invalid temperature value detected")
+        let s_temp = fs::read_to_string(path).expect("Could not read temperature device");
+        s_temp
+            .trim()
+            .parse::<i64>()
+            .expect("Invalid temperature value detected")
     }
 
     fn get_interval(&self) -> time::Duration {
@@ -67,27 +67,72 @@ impl Config {
         }
     }
 
-    fn read_conf() -> Self {        
-        let s = fs::read_to_string("/etc/jetson-fan-ctl-rust/config.json")
-            .expect("Could not read the config file");
+    fn read_conf() -> Self {
+        let mut conf = Ini::new();
+        conf.load("/etc/jetson-fan-ctl-rust/config.ini")
+            .expect("Failed to read config.ini file");
 
-        let config: Config = match serde_json::from_str(&s) {
-            Ok(conf) => {
-                conf
-            },
-            Err(_) => {
-                println!("Invalid config file detected. Falling to default...");
-                Config::default()
-            }
-        };
-        assert!(config.min_temp < config.max_temp, "max temp is lower them min temp. Terminating...");
+        let mut config = Config::default();
+
+        if let Some(i) = conf.get("Configuration", "min_temp") {
+            config.min_temp = i.parse::<i64>().expect("Invalid min_temp value");
+        } else {
+            println!(
+                "No min_temp specified in config. Falling to default {}...",
+                config.min_temp
+            );
+        }
+        if let Some(i) = conf.get("Configuration", "max_temp") {
+            config.max_temp = i.parse::<i64>().expect("Invalid max_temp value");
+        } else {
+            println!(
+                "No max_temp specified in config. Falling to default {}...",
+                config.max_temp
+            );
+        }
+        if let Some(i) = conf.get("Configuration", "interval_sec") {
+            config.interval_sec = i.parse::<u64>().expect("Invalid interval_sec value");
+        } else {
+            println!(
+                "No interval_sec specified in config. Falling to default {}...",
+                config.interval_sec
+            );
+        }
+        if let Some(i) = conf.get("Configuration", "thermal_zone") {
+            config.thermal_zone = match i.as_str() {
+                "A0" => ThermalZone::A0,
+                "CPU" => ThermalZone::CPU,
+                "GPU" => ThermalZone::GPU,
+                "PLL" => ThermalZone::PLL,
+                "PMIC" => ThermalZone::PMIC,
+                "FAN" => ThermalZone::FAN,
+                _ => panic!("Invalid zone value"),
+            };
+        } else {
+            println!(
+                "No thermal_zone specified in config. Falling to default {:?}...",
+                config.thermal_zone
+            );
+        }
+        if let Ok(Some(i)) = conf.getbool("Configuration", "max_perf") {
+            config.max_perf = i;
+        } else {
+            println!(
+                "No max_perf specified in config. Falling to default {}...",
+                config.max_perf
+            );
+        }
+        assert!(
+            config.min_temp < config.max_temp,
+            "max temp is lower them min temp. Terminating..."
+        );
 
         config
     }
 }
-    
+
 struct FanState {
-    cur_speed: u8
+    cur_speed: u8,
 }
 
 impl FanState {
@@ -99,9 +144,7 @@ impl FanState {
     }
 
     fn new() -> Self {
-        let mut new = Self {
-            cur_speed: 255
-        };
+        let mut new = Self { cur_speed: 255 };
         new.set(0);
         new
     }

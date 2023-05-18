@@ -19,7 +19,7 @@ echo "Done."
 echo "Installing config..."
 rm -r $CONF_PATH 2>/dev/null
 mkdir -p $CONF_PATH
-cp config.json $CONF_PATH
+cp config.ini $CONF_PATH
 echo "Done."
 
 echo "Adding service to /lib/systemd/system/..."
@@ -35,4 +35,4 @@ echo "Done."
 
 echo "$NAME installed sucessfully!"
 echo ""
-echo "To configure, edit /etc/$NAME/config.json (needs sudo)"
+echo "To configure, edit /etc/$NAME/config.ini (needs sudo)"

@@ -1,7 +1,0 @@
-{
-    "min_temp": 30000,
-    "max_temp": 60000,
-    "interval_sec": 5,
-    "thermal_zone": "FAN",
-    "max_perf": true
-}

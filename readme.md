@@ -37,13 +37,12 @@ open /etc/automagic-fan/config.json with your favorite editor (I'm using nano):
 
 you will find the following lines:
 ```
-    {
-        "min_temp": 30000,
-        "max_temp": 60000,
-        "interval_sec": 5,
-        "thermal_zone": "FAN",
-        "max_perf": true
-    }
+[Configuration]
+min_temp: 30000
+max_temp: 60000
+interval_sec: 5
+thermal_zone: FAN
+max_perf: true
 ```
 <code>min_temp</code> is the temperature (0.001°C) below which the fan is at 0% speed.  
 <code>max_temp</code> is the temperature (0.001°C) above which the fan is at 100% speed.  
@@ -55,7 +54,7 @@ The script interpolates linearly between these two points.
 * GPU
 * PLL
 * PMIC
-* FAN
+* FAN (Set as default. Average of CPU&GPU)
 
 <code>interval_sec</code> tells the script how often to update the fan speed (in seconds).  
 <code>max_perf</code> will execute the jetson_clocks script at sevice start if set.
@@ -63,7 +62,7 @@ The script interpolates linearly between these two points.
 You can only use integers in each of these fields. No floating point values allowed.
 The temperature precision of the thermal sensors is 0.5 (°C), so don't expect this to be too precise.
 
-Any changes in the script will be will be applied after the next reboot.  
+Any changes in the script will be will be applied after the next reboot.
 You can run
 
     sudo service jetson-fan-ctl-rust restart
